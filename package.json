@@ -1,14 +1,18 @@
 {
-  "name": "react-tailwind-css-starter-pack",
+  "name": "stacktrack",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-oauth/google": "^0.12.2",
     "axios": "^1.12.2",
     "concurrently": "^9.2.1",
+    "lucide-react": "^0.559.0",
     "moment": "^2.30.1",
     "pdfkit": "^0.17.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.6.0",
+    "react-router-dom": "^7.10.1",
     "react-scripts": "5.0.1",
     "web-vitals": "^2.1.4"
   },

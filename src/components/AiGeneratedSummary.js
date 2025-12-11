@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 
 const AiGeneratedSummary = () => {
@@ -13,14 +14,17 @@ const AiGeneratedSummary = () => {
     setLoading(true);
     setError('');
     setGeminiSummary('');
+    const toastId = toast.loading('Generating summary...');
     try {
       const res = await axios.post('https://expensetracker-backend-9cqw.onrender.com/run-gemini', {
         description: aiSummaryText
       });
       const text = res.data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No summary received.';
       setGeminiSummary(text);
+      toast.success('Summary generated successfully', { id: toastId });
     } catch (e) {
       setError('Could not get summary. ' + (e.response?.data?.error || e.message));
+      toast.error('Could not get summary', { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -74,4 +78,3 @@ const AiGeneratedSummary = () => {
 };
 
 export default AiGeneratedSummary;
-
