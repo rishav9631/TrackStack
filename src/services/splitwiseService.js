@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/splitwise';
+const API_URL = (process.env.REACT_APP_BASE_URL || 'http://localhost:5000') + '/api/splitwise';
+console.log('Splitwise Service API URL:', API_URL);
 
 const getAuthHeaders = () => {
     const token = localStorage.getItem('token');

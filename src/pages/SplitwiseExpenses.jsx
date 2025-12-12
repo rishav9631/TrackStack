@@ -271,6 +271,7 @@ const SplitwiseExpenses = () => {
                                     className="w-full bg-gray-900/50 border border-gray-600 rounded-xl px-4 py-3.5 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder-gray-600"
                                     placeholder="Enter your consumer secret"
                                     required
+                                    autoComplete="current-password"
                                 />
                             </div>
                             <button
