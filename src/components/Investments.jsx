@@ -4,6 +4,7 @@ import { RefreshCw, TrendingUp, DollarSign, BarChart2, Layers, Plus, Edit2, X, S
 import toast from 'react-hot-toast';
 import { Link } from 'react-router-dom';
 import { addInvestment, getInvestments } from '../services/api';
+import SIPCalculator from './SIPCalculator';
 
 const Investments = () => {
     const [metals, setMetals] = useState(null);
@@ -13,6 +14,7 @@ const Investments = () => {
     const [loading, setLoading] = useState(true);
     const [lastUpdated, setLastUpdated] = useState(new Date());
     const [activeMoverTab, setActiveMoverTab] = useState('largeCap');
+    const [showCalculator, setShowCalculator] = useState(false);
 
     // Portfolio State
     const [holdings, setHoldings] = useState({});
@@ -391,6 +393,11 @@ const Investments = () => {
 
     return (
         <div className="min-h-screen bg-gray-900 text-gray-200 p-4 sm:p-8">
+            {/* SIP Calculator Modal */}
+            {showCalculator && (
+                <SIPCalculator onClose={() => setShowCalculator(false)} />
+            )}
+
             {/* Edit Modal */}
             {editingId && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -444,6 +451,13 @@ const Investments = () => {
                             Real-time market data and investment tracking
                         </p>
                     </div>
+                    <button
+                        onClick={() => setShowCalculator(true)}
+                        className="flex items-center gap-2 px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-600 text-white rounded-xl transition-colors"
+                    >
+                        <TrendingUp className="w-4 h-4 text-emerald-400" />
+                        <span>SIP Calculator</span>
+                    </button>
                     <button
                         onClick={fetchAllData}
                         className="flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl transition-colors shadow-lg shadow-emerald-900/20"
