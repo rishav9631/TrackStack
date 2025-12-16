@@ -3,6 +3,7 @@ const router = express.Router();
 const expenseController = require('../controllers/expenseController');
 
 const expenseCategoryController = require('../controllers/expenseCategoryController');
+const mailgreport = require('../controllers/mailgreport');
 
 // Category Routes
 router.get('/categories', expenseCategoryController.getExpenseCategories);
@@ -16,7 +17,7 @@ router.put('/:id', expenseController.updateExpense);
 router.delete('/:id', expenseController.deleteExpense);
 router.delete('/', expenseController.deleteAllExpenses);
 router.post('/report', expenseController.getExpenseReport);
-router.post('/report/pdf', expenseController.getExpenseReportPdf);
+router.post('/report/pdf', mailgreport.generatePdfReport);
 router.post('/report/email-pdf', expenseController.emailExpenseReport);
 
 module.exports = router;

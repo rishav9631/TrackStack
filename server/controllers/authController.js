@@ -43,7 +43,7 @@ exports.googleLogin = async (req, res) => {
 
         // Send Login Email
         try {
-            await mailSender(user.email, "Login Notification", loginTemplate(user.name));
+            mailSender(user.email, "Login Notification", loginTemplate(user.name));
         } catch (mailError) {
             console.log("Failed to send login email", mailError);
         }
@@ -153,7 +153,7 @@ exports.login = async (req, res) => {
 
             // Send Login Email
             try {
-                await mailSender(user.email, "Login Notification", loginTemplate(user.name));
+                mailSender(user.email, "Login Notification", loginTemplate(user.name));
             } catch (mailError) {
                 console.log("Failed to send login email", mailError);
             }
