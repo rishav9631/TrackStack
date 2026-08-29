@@ -29,12 +29,14 @@ const Budgeting = ({ budgets, setBudgets }) => {
             }
         };
         fetchCategories();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         if (categories.length > 0 && !budgetForm.category) {
             setBudgetForm(prev => ({ ...prev, category: categories[0].name }));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [categories]);
 
     const handleBudgetChange = (e) => setBudgetForm({ ...budgetForm, [e.target.name]: e.target.value });

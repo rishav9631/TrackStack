@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 const SplitwiseCallback = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const [processing, setProcessing] = useState(true);
+    const [, setProcessing] = useState(true);
 
     useEffect(() => {
         const code = searchParams.get('code');

@@ -16,6 +16,7 @@ const SplitwiseExpenses = () => {
 
     useEffect(() => {
         checkConnection();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const checkConnection = async () => {

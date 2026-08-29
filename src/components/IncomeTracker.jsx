@@ -29,12 +29,14 @@ const IncomeTracker = ({ income, setIncome }) => {
             }
         };
         fetchCategories();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
         if (categories.length > 0 && !incomeForm.source) {
             setIncomeForm(prev => ({ ...prev, source: categories[0].name }));
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [categories]);
 
     const handleIncomeChange = (e) => setIncomeForm({ ...incomeForm, [e.target.name]: e.target.value });

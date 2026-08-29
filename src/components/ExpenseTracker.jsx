@@ -35,6 +35,7 @@ const ExpenseTracker = ({ expenses, setExpenses }) => {
             }
         };
         fetchCategories();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleExpenseChange = (e) => setExpenseForm({ ...expenseForm, [e.target.name]: e.target.value });

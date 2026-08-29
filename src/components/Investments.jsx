@@ -262,6 +262,7 @@ const Investments = () => {
 
     useEffect(() => {
         fetchAllData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     // Helper to get current price for a symbol
@@ -306,6 +307,7 @@ const Investments = () => {
         const totalPnLPercent = totalInvested > 0 ? (totalPnL / totalInvested) * 100 : 0;
 
         return { totalInvested, totalCurrentValue, totalPnL, totalPnLPercent };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [holdings, metals, mutualFunds, stock, marketMovers]);
 
     // Helper to calculate returns
