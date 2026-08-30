@@ -27,24 +27,24 @@ const App = () => {
   };
 
   return (
-    <div className="relative min-h-screen">
-      {/* Global Background Decoration */}
+    <div className="relative min-h-screen bg-gray-950 text-gray-100 font-sans selection:bg-emerald-500 selection:text-white">
+      {/* Global Ambient Background */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
-        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-[-10%] left-[-5%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] left-[-5%] w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px]"></div>
       </div>
 
-      <div className="relative z-10">
+      <div className="relative z-10 w-full min-h-screen">
         <Router>
           <Toaster position="top-center" reverseOrder={false} />
           <Routes>
             <Route
               path="/login"
-              element={!isAuthenticated ? <Login setAuth={setAuth} /> : <Navigate to="/" />}
+              element={!isAuthenticated ? <Login setAuth={setAuth} /> : <Navigate to="/dashboard" />}
             />
             <Route
               path="/signup"
-              element={!isAuthenticated ? <Signup /> : <Navigate to="/" />}
+              element={!isAuthenticated ? <Signup /> : <Navigate to="/dashboard" />}
             />
             <Route
               path="/verify-email/:token"
@@ -56,7 +56,31 @@ const App = () => {
             />
             <Route
               path="/"
-              element={isAuthenticated ? <Home setAuth={setAuth} /> : <Navigate to="/login" />}
+              element={<Navigate to="/dashboard" replace />}
+            />
+            <Route
+              path="/dashboard"
+              element={isAuthenticated ? <Home setAuth={setAuth} initialTab="dashboard" /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/admin"
+              element={isAuthenticated ? <Home setAuth={setAuth} initialTab="admin" /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/addons"
+              element={isAuthenticated ? <Home setAuth={setAuth} initialTab="addons" /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/expenses"
+              element={isAuthenticated ? <Home setAuth={setAuth} initialTab="expenses" /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/income"
+              element={isAuthenticated ? <Home setAuth={setAuth} initialTab="income" /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/budget"
+              element={isAuthenticated ? <Home setAuth={setAuth} initialTab="budget" /> : <Navigate to="/login" />}
             />
             <Route
               path="/investments"

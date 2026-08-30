@@ -1,5 +1,7 @@
 const AppConfig = require('../models/AppConfig');
+const User = require('../models/User');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
 let cachedConfig = null;
@@ -18,6 +20,11 @@ const getConfigInternal = async () => {
     let config = await AppConfig.findOne();
     if (!config) {
         config = await AppConfig.create({
+            geminiApiKey: process.env.GEMINI_API_KEY || '',
+            geminiApiUrl: process.env.GEMINI_URL || 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+            gmailClientId: process.env.GMAIL_CLIENT_ID || '',
+            gmailClientSecret: process.env.GMAIL_CLIENT_SECRET || '',
+            gmailRefreshToken: process.env.GMAIL_REFRESH_TOKEN || '',
             mongoUri: process.env.MONGO_URI || '',
             mailHost: process.env.MAIL_HOST || 'smtp.gmail.com',
             mailUser: process.env.MAIL_USER || '',
@@ -40,7 +47,7 @@ const clearConfigCache = () => {
     cacheTimestamp = 0;
 };
 
-// Mask helper
+// Mask secret helper
 const maskSecret = (val) => {
     if (!val || val.length < 8) return val ? '••••••••' : '';
     return val.substring(0, 4) + '••••••••' + val.substring(val.length - 4);
@@ -56,6 +63,9 @@ const getConfig = async (req, res) => {
             ...config,
             _id: undefined,
             __v: undefined,
+            geminiApiKey: maskSecret(config.geminiApiKey),
+            gmailClientSecret: maskSecret(config.gmailClientSecret),
+            gmailRefreshToken: maskSecret(config.gmailRefreshToken),
             mailPass: maskSecret(config.mailPass),
         };
         res.json({ success: true, config: safeConfig });
@@ -91,9 +101,11 @@ const updateConfig = async (req, res) => {
         delete updates.createdAt;
         delete updates.updatedAt;
 
-        if (updates.mailPass && updates.mailPass.includes('••••')) {
-            delete updates.mailPass;
-        }
+        // Skip masked secret values
+        if (updates.geminiApiKey && updates.geminiApiKey.includes('••••')) delete updates.geminiApiKey;
+        if (updates.gmailClientSecret && updates.gmailClientSecret.includes('••••')) delete updates.gmailClientSecret;
+        if (updates.gmailRefreshToken && updates.gmailRefreshToken.includes('••••')) delete updates.gmailRefreshToken;
+        if (updates.mailPass && updates.mailPass.includes('••••')) delete updates.mailPass;
 
         const config = await AppConfig.findOneAndUpdate(
             {},
@@ -116,7 +128,6 @@ const updateConfig = async (req, res) => {
 
 /**
  * POST /api/config/test-mongo
- * Test connection to a MongoDB URI
  */
 const testMongoConnection = async (req, res) => {
     const { mongoUri } = req.body;
@@ -148,6 +159,93 @@ const testMongoConnection = async (req, res) => {
     }
 };
 
+/**
+ * POST /api/config/seed-master
+ * Seed or update a master user in MongoDB with isSeeded: true flag
+ */
+const seedMasterUser = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({ success: false, message: 'Email and Password are required' });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        let user = await User.findOne({ email: normalizedEmail });
+        if (user) {
+            user.name = name || user.name || 'Master Admin';
+            user.password = hashedPassword;
+            user.isVerified = true;
+            user.isSeeded = true;
+            user.role = 'Admin';
+            await user.save();
+        } else {
+            user = await User.create({
+                name: name || 'Master Admin',
+                email: normalizedEmail,
+                password: hashedPassword,
+                isVerified: true,
+                isSeeded: true,
+                role: 'Admin',
+                customCategories: ['Rent', 'Electricity', 'Maid', 'Groceries', 'Food', 'Entertainment', 'Loan Repayment', 'Miscellaneous'],
+            });
+        }
+
+        res.json({
+            success: true,
+            message: `Master user ${normalizedEmail} successfully seeded in database.`,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                isSeeded: user.isSeeded,
+                role: user.role,
+            },
+        });
+    } catch (error) {
+        console.error('[SeedMaster] Error:', error.message);
+        res.status(500).json({ success: false, message: `Failed to seed master user: ${error.message}` });
+    }
+};
+
+/**
+ * POST /api/config/remove-seeded
+ * Deletes all users flagged with isSeeded: true from MongoDB
+ */
+const removeSeededUsers = async (req, res) => {
+    try {
+        const result = await User.deleteMany({ isSeeded: true });
+        res.json({
+            success: true,
+            message: `Successfully removed ${result.deletedCount} seeded user(s) from database.`,
+            deletedCount: result.deletedCount,
+        });
+    } catch (error) {
+        console.error('[RemoveSeeded] Error:', error.message);
+        res.status(500).json({ success: false, message: `Failed to remove seeded users: ${error.message}` });
+    }
+};
+
+/**
+ * GET /api/config/seeded-users
+ * Returns list of currently active seeded users in MongoDB
+ */
+const getSeededUsers = async (req, res) => {
+    try {
+        const users = await User.find({ isSeeded: true }).select('name email isSeeded role createdAt');
+        res.json({
+            success: true,
+            users,
+        });
+    } catch (error) {
+        console.error('[GetSeededUsers] Error:', error.message);
+        res.status(500).json({ success: false, message: 'Failed to fetch seeded users.' });
+    }
+};
+
 module.exports = {
     getConfig,
     getConfigRaw,
@@ -155,4 +253,7 @@ module.exports = {
     getConfigInternal,
     clearConfigCache,
     testMongoConnection,
+    seedMasterUser,
+    removeSeededUsers,
+    getSeededUsers,
 };

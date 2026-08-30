@@ -2,10 +2,37 @@ const mongoose = require('mongoose');
 
 const appConfigSchema = new mongoose.Schema(
     {
+        // Gemini API Configuration
+        geminiApiKey: {
+            type: String,
+            default: '',
+        },
+        geminiApiUrl: {
+            type: String,
+            default: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent',
+        },
+
+        // Gmail REST API Configuration
+        gmailClientId: {
+            type: String,
+            default: '',
+        },
+        gmailClientSecret: {
+            type: String,
+            default: '',
+        },
+        gmailRefreshToken: {
+            type: String,
+            default: '',
+        },
+
+        // Database Configuration
         mongoUri: {
             type: String,
             default: '',
         },
+
+        // Email / SMTP Configuration
         mailHost: {
             type: String,
             default: 'smtp.gmail.com',
@@ -18,6 +45,8 @@ const appConfigSchema = new mongoose.Schema(
             type: String,
             default: '',
         },
+
+        // Endpoints & Ports
         googleClientId: {
             type: String,
             default: '',

@@ -94,6 +94,9 @@ export const getAppConfig = () => api.get('/api/config');
 export const getAppConfigRaw = () => api.get('/api/config/raw');
 export const updateAppConfig = (data) => api.put('/api/config', data);
 export const testMongoUri = (mongoUri) => api.post('/api/config/test-mongo', { mongoUri });
+export const seedMasterUser = (userData) => api.post('/api/config/seed-master', userData);
+export const removeSeededUsers = () => api.post('/api/config/remove-seeded');
+export const getSeededUsers = () => api.get('/api/config/seeded-users');
 
 export default api;
 
