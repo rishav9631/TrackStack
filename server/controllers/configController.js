@@ -23,8 +23,8 @@ const getConfigInternal = async () => {
             mailUser: process.env.MAIL_USER || '',
             mailPass: process.env.MAIL_PASS || '',
             googleClientId: process.env.GOOGLE_CLIENT_ID || '',
-            reactAppBaseUrl: process.env.REACT_APP_BASE_URL || 'http://localhost:3000',
-            splitwiseRedirectUri: process.env.SPLITWISE_REDIRECT_URI || 'http://localhost:3000/callback',
+            reactAppBaseUrl: process.env.REACT_APP_BASE_URL || 'https://track-stack-git-main-rishavs-projects-ae4e8857.vercel.app',
+            splitwiseRedirectUri: process.env.SPLITWISE_REDIRECT_URI || 'https://track-stack-git-main-rishavs-projects-ae4e8857.vercel.app/callback',
             port: process.env.PORT ? parseInt(process.env.PORT, 10) : 5000,
         });
         console.log('[AppConfig] Seeded default configuration from environment variables.');

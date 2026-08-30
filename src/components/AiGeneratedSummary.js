@@ -15,9 +15,12 @@ const AiGeneratedSummary = () => {
     setError('');
     setGeminiSummary('');
     const toastId = toast.loading('Generating summary...');
-    try {
-      const res = await axios.post('https://expensetracker-backend-9cqw.onrender.com/run-gemini', {
+      const backendUrl = process.env.REACT_APP_BASE_URL || 'https://stacktrack-backend.onrender.com';
+      const token = localStorage.getItem('token');
+      const res = await axios.post(`${backendUrl}/run-gemini`, {
         description: aiSummaryText
+      }, {
+        headers: token ? { 'x-auth-token': token } : {}
       });
       const text = res.data?.candidates?.[0]?.content?.parts?.[0]?.text || 'No summary received.';
       setGeminiSummary(text);

@@ -9,7 +9,7 @@ exports.loginTemplate = (name) => {
             Track your expenses, manage your budget, and stay on top of your finances.
         </p>
         <div style="text-align: center; margin-top: 30px;">
-            <a href="https://expensetracker-hosting.vercel.app/" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Go to Dashboard</a>
+            <a href="${process.env.REACT_APP_BASE_URL || 'https://track-stack-git-main-rishavs-projects-ae4e8857.vercel.app'}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Go to Dashboard</a>
         </div>
         <p style="color: #999; font-size: 12px; text-align: center; margin-top: 30px;">
             If this wasn't you, please contact support immediately.

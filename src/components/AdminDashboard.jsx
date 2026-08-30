@@ -10,8 +10,8 @@ const AdminDashboard = () => {
         mailUser: '',
         mailPass: '',
         googleClientId: '',
-        reactAppBaseUrl: 'http://localhost:3000',
-        splitwiseRedirectUri: 'http://localhost:3000/callback',
+        reactAppBaseUrl: 'https://track-stack-git-main-rishavs-projects-ae4e8857.vercel.app',
+        splitwiseRedirectUri: 'https://track-stack-git-main-rishavs-projects-ae4e8857.vercel.app/callback',
         port: 5000,
     });
     const [loading, setLoading] = useState(false);

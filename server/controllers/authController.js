@@ -10,7 +10,7 @@ const { OAuth2Client } = require('google-auth-library');
 const { loginTemplate, signupTemplate } = require('../utils/emailTemplates');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here';
-const CLIENT_URL = 'http://localhost:3000';
+const CLIENT_URL = process.env.REACT_APP_BASE_URL || 'https://track-stack-git-main-rishavs-projects-ae4e8857.vercel.app';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);

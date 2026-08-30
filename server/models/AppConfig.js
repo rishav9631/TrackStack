@@ -24,11 +24,11 @@ const appConfigSchema = new mongoose.Schema(
         },
         reactAppBaseUrl: {
             type: String,
-            default: 'http://localhost:3000',
+            default: 'https://track-stack-git-main-rishavs-projects-ae4e8857.vercel.app',
         },
         splitwiseRedirectUri: {
             type: String,
-            default: 'http://localhost:3000/callback',
+            default: 'https://track-stack-git-main-rishavs-projects-ae4e8857.vercel.app/callback',
         },
         port: {
             type: Number,
