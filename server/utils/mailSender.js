@@ -132,11 +132,40 @@ const mailSender = async (email, title, body, attachments = []) => {
             console.log(`[MailSender] Email sent via Gmail REST API! Message ID: ${response.data?.id}`);
             return response.data;
         } catch (gmailErr) {
-            console.warn(`[MailSender] Gmail REST API failed (${gmailErr.message}). Falling back to SMTP...`);
+            console.warn(`[MailSender] Gmail REST API notice (${gmailErr.message}). Trying fallbacks...`);
         }
     }
 
-    // ── METHOD 2: Nodemailer SMTP Fallback ────────────────────────────────────
+    // ── METHOD 2: Resend API (HTTPS Port 443 — Instant Fallback) ─────────────
+    const resendApiKey = (config && config.resendApiKey) || process.env.RESEND_API_KEY || '';
+    if (resendApiKey) {
+        try {
+            console.log('[MailSender] Attempting Resend API (HTTPS)...');
+            const response = await axios.post(
+                'https://api.resend.com/emails',
+                {
+                    from: 'StackTrack <onboarding@resend.dev>',
+                    to: [email],
+                    subject: title,
+                    html: body,
+                    reply_to: senderEmail,
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${resendApiKey}`,
+                        'Content-Type': 'application/json',
+                    },
+                    timeout: 15000,
+                }
+            );
+            console.log(`[MailSender] Email sent via Resend API! ID: ${response.data?.id}`);
+            return response.data;
+        } catch (resendErr) {
+            console.warn(`[MailSender] Resend API notice: ${resendErr.message}`);
+        }
+    }
+
+    // ── METHOD 3: Nodemailer SMTP Fallback ────────────────────────────────────
     try {
         console.log('[MailSender] Attempting SMTP Transporter...');
         const transporter = nodemailer.createTransport({

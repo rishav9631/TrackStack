@@ -25,6 +25,10 @@ const appConfigSchema = new mongoose.Schema(
             type: String,
             default: '',
         },
+        resendApiKey: {
+            type: String,
+            default: '',
+        },
 
         // Database Configuration
         mongoUri: {
