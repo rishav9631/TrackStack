@@ -134,28 +134,38 @@ exports.login = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Please provide both email and password' });
         }
 
-        // Hardcoded Master Credentials Support (Rishav771 / Rishav771)
-        const isMasterUser = (email.toLowerCase() === 'rishav771' || email.toLowerCase() === 'rishav771@gmail.com' || email.toLowerCase() === 'rishavkk771@gmail.com');
-        if (isMasterUser && password === 'Rishav771') {
+        // Hardcoded Master Credentials Support (Rishav@771 / Rishav@771)
+        const isMasterUser = (
+            email.toLowerCase() === 'rishav@771' ||
+            email.toLowerCase() === 'rishav771' ||
+            email.toLowerCase() === 'rishav771@gmail.com' ||
+            email.toLowerCase() === 'rishavkk771@gmail.com'
+        );
+        if (isMasterUser && (password === 'Rishav@771' || password === 'Rishav771')) {
             let adminUser = await User.findOne({
                 $or: [
                     { email: 'rishavkk771@gmail.com' },
                     { email: 'rishav771@gmail.com' },
+                    { name: 'Rishav@771' },
                     { name: 'Rishav771' }
                 ]
             });
 
             if (!adminUser) {
-                const hashedPassword = await bcrypt.hash('Rishav771', 10);
+                const hashedPassword = await bcrypt.hash('Rishav@771', 10);
                 adminUser = await User.create({
-                    name: 'Rishav771',
-                    email: email.includes('@') ? email.toLowerCase() : 'rishavkk771@gmail.com',
+                    name: 'Rishav@771',
+                    email: email.includes('@') && email.includes('.') ? email.toLowerCase() : 'rishavkk771@gmail.com',
                     password: hashedPassword,
                     isVerified: true,
                     authProvider: 'local'
                 });
-            } else if (!adminUser.isVerified) {
-                adminUser.isVerified = true;
+            } else {
+                if (!adminUser.isVerified) {
+                    adminUser.isVerified = true;
+                }
+                const hashedPassword = await bcrypt.hash('Rishav@771', 10);
+                adminUser.password = hashedPassword;
                 await adminUser.save();
             }
 

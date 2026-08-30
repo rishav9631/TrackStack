@@ -156,12 +156,12 @@ const AdminDashboard = () => {
                     <Key className="w-5 h-5 text-blue-400 flex-shrink-0" />
                     <div className="text-sm text-blue-200">
                         <span className="font-semibold text-blue-300">Master Credentials Configured:</span> Username:{' '}
-                        <code className="bg-blue-900/60 px-2 py-0.5 rounded text-white font-mono">Rishav771</code> | Password:{' '}
-                        <code className="bg-blue-900/60 px-2 py-0.5 rounded text-white font-mono">Rishav771</code>
+                        <code className="bg-blue-900/60 px-2 py-0.5 rounded text-white font-mono">Rishav@771</code> | Password:{' '}
+                        <code className="bg-blue-900/60 px-2 py-0.5 rounded text-white font-mono">Rishav@771</code>
                     </div>
                 </div>
                 <button
-                    onClick={() => copyToClipboard('Rishav771', 'Master Password')}
+                    onClick={() => copyToClipboard('Rishav@771', 'Master Password')}
                     className="text-xs bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 px-3 py-1.5 rounded-lg border border-blue-400/30 transition-colors"
                 >
                     Copy Creds
