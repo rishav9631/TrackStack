@@ -143,6 +143,8 @@ const mailSender = async (email, title, body, attachments = []) => {
             host: mailHost,
             port: 587,
             secure: false,
+            connectionTimeout: 5000,
+            socketTimeout: 5000,
             auth: {
                 user: mailUser,
                 pass: mailPass,
