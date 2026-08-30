@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAppConfigRaw, updateAppConfig, testMongoUri } from '../services/api';
 import toast from 'react-hot-toast';
-import { Database, Save, CheckCircle, XCircle, Eye, EyeOff, Copy, RefreshCw, Key, Shield, Server, Mail, Globe } from 'lucide-react';
+import { Database, Save, CheckCircle, XCircle, Eye, EyeOff, Copy, RefreshCw, Key, Shield, Mail, Globe } from 'lucide-react';
 
 const AdminDashboard = () => {
     const [config, setConfig] = useState({
