@@ -22,6 +22,14 @@ app.options('*', cors());
 
 app.use(express.json());
 
+// Ensure DB connection on incoming requests
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+  } catch (_) {}
+  next();
+});
+
 // Wake-up Ping (Public)
 app.get('/api/start', (req, res) => {
   try {

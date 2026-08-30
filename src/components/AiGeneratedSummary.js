@@ -15,6 +15,7 @@ const AiGeneratedSummary = () => {
     setError('');
     setGeminiSummary('');
     const toastId = toast.loading('Generating summary...');
+    try {
       const backendUrl = process.env.REACT_APP_BASE_URL || 'https://stacktrack-backend.onrender.com';
       const token = localStorage.getItem('token');
       const res = await axios.post(`${backendUrl}/run-gemini`, {

@@ -17,6 +17,9 @@ server/node_modules/
 .env
 .env*.local
 *.env
+seedUser.js
+server/seedUser.js
+*seed*.js
 
 npm-debug.log*
 yarn-debug.log*
