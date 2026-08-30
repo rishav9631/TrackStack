@@ -9,7 +9,17 @@ connectDB();
 
 const app = express();
 
-app.use(cors());
+// Comprehensive CORS setup
+app.use(cors({
+  origin: true, // Reflects the requesting origin (Vercel, localhost, etc.)
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token', 'X-Requested-With', 'Accept'],
+}));
+
+// Handle preflight OPTIONS requests for all routes
+app.options('*', cors());
+
 app.use(express.json());
 
 // Wake-up Ping (Public)
