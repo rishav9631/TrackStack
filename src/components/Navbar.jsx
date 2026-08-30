@@ -44,6 +44,14 @@ const Navbar = ({ activeTab, setActiveTab }) => {
                         Add-ons
                     </button>
                 </li>
+                <li>
+                    <button
+                        onClick={() => setActiveTab('admin')}
+                        className={`p-3 rounded-2xl transition-colors ${activeTab === 'admin' ? 'bg-emerald-600 text-white' : 'hover:bg-gray-700 text-gray-300'}`}
+                    >
+                        Admin
+                    </button>
+                </li>
             </ul>
         </nav>
     );

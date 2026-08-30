@@ -33,6 +33,7 @@ app.use('/api/groups', require('./routes/groupRoutes'));
 app.use('/run-gemini', authMiddleware, require('./routes/aiRoutes'));
 app.use('/api/investments', authMiddleware, require('./routes/investmentRoutes'));
 app.use('/api/splitwise', require('./routes/splitwiseRoutes'));
+app.use('/api/config', require('./routes/configRoutes'));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -89,4 +89,11 @@ export const deleteInvestment = async (id) => {
     return response.data;
 };
 
+// System / App Config APIs
+export const getAppConfig = () => api.get('/api/config');
+export const getAppConfigRaw = () => api.get('/api/config/raw');
+export const updateAppConfig = (data) => api.put('/api/config', data);
+export const testMongoUri = (mongoUri) => api.post('/api/config/test-mongo', { mongoUri });
+
 export default api;
+

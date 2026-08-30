@@ -4,6 +4,7 @@ import Dashboard from '../components/Dashboard';
 import ExpenseTracker from '../components/ExpenseTracker';
 import IncomeTracker from '../components/IncomeTracker';
 import Budgeting from '../components/Budgeting';
+import AdminDashboard from '../components/AdminDashboard';
 import { getExpenses, getIncomes, getBudgets, getMe } from '../services/api';
 import { Link } from 'react-router-dom';
 import { TrendingUp, Divide } from 'lucide-react';
@@ -175,6 +176,10 @@ const Home = ({ setAuth }) => {
                             </div>
                         </Link>
                     </div>
+                )}
+
+                {activeTab === 'admin' && (
+                    <AdminDashboard />
                 )}
             </div>
         </div>

