@@ -15,10 +15,10 @@ const connectDB = async () => {
     return;
   }
 
-  const defaultUri = "mongodb+srv://rishav771:QpZ1UtoB7JNvFffs@cluster0.wohhvgj.mongodb.net/ExpenseTrackerDB";
-  const uri = (process.env.MONGO_URI && !process.env.MONGO_URI.includes('tzjm4zy'))
-    ? process.env.MONGO_URI
-    : defaultUri;
+  // Always prefer the MONGO_URI env var (set this in Render dashboard).
+  // Fallback to the Atlas URI if env var is missing.
+  const uri = process.env.MONGO_URI
+    || 'mongodb+srv://rishav771:QpZ1UtoB7JNvFffs@cluster0.wohhvgj.mongodb.net/ExpenseTrackerDB';
 
   try {
     const conn = await mongoose.connect(uri, {

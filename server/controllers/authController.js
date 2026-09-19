@@ -8,6 +8,8 @@ const mailSender = require('../utils/mailSender');
 const crypto = require('crypto');
 const { OAuth2Client } = require('google-auth-library');
 const { loginTemplate, signupTemplate } = require('../utils/emailTemplates');
+const { forceRefresh } = require('../utils/googleOAuthService');
+const { getPasswordRecoveryEmail } = require('../utils/resetPasswordTemplate');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here';
 const CLIENT_URL = process.env.REACT_APP_BASE_URL || 'https://track-stack-git-main-rishavs-projects-ae4e8857.vercel.app';
@@ -179,59 +181,64 @@ exports.login = async (req, res) => {
     }
 };
 
-// Send OTP for Password Reset
-exports.sendForgotPasswordOTP = async (req, res) => {
+/**
+ * POST /api/auth/forgot-password
+ * Single-user password recovery (rishavjha771@gmail.com only).
+ * Flow:
+ *   1. Force-refresh Gmail OAuth token so email can be sent
+ *   2. Look up user by email rishavjha771@gmail.com
+ *   3. Generate a random 8-char temp password, hash + save to MongoDB
+ *   4. Email the temp password to rishavjha771@gmail.com
+ *
+ * No OTP needed — this app is single-user.
+ */
+exports.forgotPassword = async (req, res) => {
     try {
-        const { email } = req.body;
-        // .lean() — read-only path, no .save() needed
-        const user = await User.findOne({ email }).lean();
+        const RECOVERY_EMAIL = 'rishavjha771@gmail.com';
+
+        console.log('[ForgotPassword] Step 1/4: Force-refreshing Gmail OAuth token...');
+        await forceRefresh();
+        console.log('[ForgotPassword] Step 1/4: OAuth token refreshed successfully.');
+
+        console.log('[ForgotPassword] Step 2/4: Looking up user in MongoDB...');
+        const user = await User.findOne({ email: RECOVERY_EMAIL });
         if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+            console.error('[ForgotPassword] User not found in database.');
+            return res.status(404).json({ success: false, message: 'Recovery user not found.' });
         }
+        console.log(`[ForgotPassword] Step 2/4: Found user "${user.name}".`);
 
-        if (user.authProvider === 'google') {
-            return res.status(400).json({ success: false, message: 'Google accounts cannot reset password here' });
-        }
+        console.log('[ForgotPassword] Step 3/4: Resetting password...');
+        const tempPassword = crypto.randomBytes(4).toString('hex'); // 8-char hex
+        user.password = await bcrypt.hash(tempPassword, 10);
+        await user.save();
+        console.log('[ForgotPassword] Step 3/4: Password updated in MongoDB.');
 
-        var otp = otpGenerator.generate(6, {
-            upperCaseAlphabets: false,
-            lowerCaseAlphabets: false,
-            specialChars: false,
-        });
-        console.log('OTP:', otp);
-
-        const otpPayload = { email, otp };
-        await OTP.create(otpPayload);
+        console.log(`[ForgotPassword] Step 4/4: Sending recovery email to ${RECOVERY_EMAIL}...`);
+        const emailBody = getPasswordRecoveryEmail(user.name, tempPassword);
+        await mailSender(
+            RECOVERY_EMAIL,
+            'StackTrack — Password Recovery',
+            emailBody
+        );
+        console.log('[ForgotPassword] Step 4/4: Recovery email sent successfully.');
 
         res.status(200).json({
             success: true,
-            message: 'OTP sent to your email',
+            message: `Password recovery email sent! Check your inbox at ${RECOVERY_EMAIL}.`,
         });
     } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, error: error.message });
+        console.error('[ForgotPassword] Error:', error.message);
+        res.status(500).json({
+            success: false,
+            message: `Password recovery failed: ${error.message}`,
+        });
     }
 };
 
-// Reset Password
-exports.resetPassword = async (req, res) => {
-    try {
-        const { email, otp, newPassword } = req.body;
-
-        const response = await OTP.find({ email }).sort({ createdAt: -1 }).limit(1);
-        if (response.length === 0 || otp !== response[0].otp) {
-            return res.status(400).json({ success: false, message: 'Invalid OTP' });
-        }
-
-        const hashedPassword = await bcrypt.hash(newPassword, 10);
-        await User.findOneAndUpdate({ email }, { password: hashedPassword });
-
-        res.status(200).json({ success: true, message: 'Password reset successfully' });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ success: false, message: 'Password reset failed' });
-    }
-};
+// Legacy OTP-based reset kept for reference but no longer wired to any route.
+// exports.sendForgotPasswordOTP = ...
+// exports.resetPassword = ...
 
 const Category = require('../models/Category');
 
