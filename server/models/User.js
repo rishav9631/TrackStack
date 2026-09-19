@@ -58,4 +58,8 @@ const userSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
+// Index on name to speed up login's $or: [{ email }, { name }] query.
+// (email already has a unique index via unique: true)
+userSchema.index({ name: 1 });
+
 module.exports = mongoose.model('User', userSchema);

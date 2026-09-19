@@ -136,9 +136,10 @@ exports.login = async (req, res) => {
 
         const normalizedEmail = email.trim().toLowerCase();
 
+        // .lean() returns a plain JS object — faster for auth flows where we don't need .save()
         const user = await User.findOne({
             $or: [{ email: normalizedEmail }, { name: email.trim() }]
-        });
+        }).lean();
         if (!user) {
             return res.status(401).json({ success: false, message: 'User is not registered' });
         }
@@ -153,7 +154,8 @@ exports.login = async (req, res) => {
 
         if (await bcrypt.compare(password, user.password)) {
             const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '24h' });
-            user.password = undefined;
+            // Delete password from the plain object (lean docs can't use .save())
+            delete user.password;
 
             // Send Login Email safely
             try {
@@ -181,7 +183,8 @@ exports.login = async (req, res) => {
 exports.sendForgotPasswordOTP = async (req, res) => {
     try {
         const { email } = req.body;
-        const user = await User.findOne({ email });
+        // .lean() — read-only path, no .save() needed
+        const user = await User.findOne({ email }).lean();
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }

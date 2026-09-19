@@ -1,6 +1,7 @@
 const nodemailer = require('nodemailer');
 const axios = require('axios');
 const { getConfigInternal } = require('../controllers/configController');
+const { getValidAccessToken } = require('./googleOAuthService');
 
 /**
  * Creates a base64url-encoded RFC 2822 raw email string for Gmail API.
@@ -66,25 +67,8 @@ function createRawEmail(to, fromName, fromEmail, subject, htmlBody, attachments 
         .replace(/=+$/, '');
 }
 
-/**
- * Fetches a fresh OAuth2 access token using Gmail OAuth credentials.
- */
-async function getGmailAccessToken(clientId, clientSecret, refreshToken) {
-    const tokenRes = await axios.post(
-        'https://oauth2.googleapis.com/token',
-        {
-            client_id: clientId,
-            client_secret: clientSecret,
-            refresh_token: refreshToken,
-            grant_type: 'refresh_token',
-        },
-        {
-            headers: { 'Content-Type': 'application/json' },
-            timeout: 15000,
-        }
-    );
-    return tokenRes.data.access_token;
-}
+// getGmailAccessToken() replaced by googleOAuthService.getValidAccessToken()
+// which uses MongoDB-persisted token caching + in-memory cache for performance.
 
 /**
  * Primary Unified Email Sender:
@@ -110,30 +94,29 @@ const mailSender = async (email, title, body, attachments = []) => {
 
     console.log(`[MailSender] Sending email to: ${email} | Subject: "${title}"`);
 
-    // ── METHOD 1: Gmail REST API (HTTPS Port 443) ────────────────────────────
-    if (gmailClientId && gmailClientSecret && gmailRefreshToken) {
-        try {
-            console.log('[MailSender] Attempting Gmail REST API (HTTPS)...');
-            const accessToken = await getGmailAccessToken(gmailClientId, gmailClientSecret, gmailRefreshToken);
-            const rawEmail = createRawEmail(email, senderName, senderEmail, title, body, attachments);
+    // ── METHOD 1: Gmail REST API (via MongoDB-cached OAuth token) ─────────────
+    // getValidAccessToken() handles: in-memory cache → MongoDB → Google refresh
+    try {
+        console.log('[MailSender] Attempting Gmail REST API (HTTPS via cached OAuth)...');
+        const accessToken = await getValidAccessToken();
+        const rawEmail = createRawEmail(email, senderName, senderEmail, title, body, attachments);
 
-            const response = await axios.post(
-                'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
-                { raw: rawEmail },
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                    timeout: 30000,
-                }
-            );
+        const response = await axios.post(
+            'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
+            { raw: rawEmail },
+            {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+                timeout: 30000,
+            }
+        );
 
-            console.log(`[MailSender] Email sent via Gmail REST API! Message ID: ${response.data?.id}`);
-            return response.data;
-        } catch (gmailErr) {
-            console.warn(`[MailSender] Gmail REST API notice (${gmailErr.message}). Trying fallbacks...`);
-        }
+        console.log(`[MailSender] Email sent via Gmail REST API! Message ID: ${response.data?.id}`);
+        return response.data;
+    } catch (gmailErr) {
+        console.warn(`[MailSender] Gmail REST API notice (${gmailErr.message}). Trying fallbacks...`);
     }
 
     // ── METHOD 2: Resend API (HTTPS Port 443 — Instant Fallback) ─────────────

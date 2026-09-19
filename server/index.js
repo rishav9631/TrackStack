@@ -52,6 +52,23 @@ app.use('/run-gemini', authMiddleware, require('./routes/aiRoutes'));
 app.use('/api/investments', authMiddleware, require('./routes/investmentRoutes'));
 app.use('/api/splitwise', require('./routes/splitwiseRoutes'));
 app.use('/api/config', require('./routes/configRoutes'));
+app.use('/api/oauth', require('./routes/oauthRoutes'));
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, async () => {
+  console.log(`Server running on port ${PORT}`);
+
+  // Auto-migrate OAuth credentials from AppConfig → GoogleOAuthToken on first boot
+  try {
+    const { migrateFromAppConfig, getTokenStatus } = require('./utils/googleOAuthService');
+    const status = await getTokenStatus();
+    if (!status.initialized) {
+      console.log('[Startup] No OAuth tokens found in MongoDB. Attempting migration from AppConfig...');
+      await migrateFromAppConfig();
+    } else {
+      console.log(`[Startup] OAuth tokens already initialized (expires in ${status.expiresInSeconds}s, refresh count: ${status.refreshCount})`);
+    }
+  } catch (err) {
+    console.error('[Startup] OAuth migration check failed:', err.message);
+  }
+});
